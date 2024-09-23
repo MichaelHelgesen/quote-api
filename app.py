@@ -104,3 +104,19 @@ def create_quote(name):
             person["quotes"].append(new_quote)
             return new_quote, 201
     return {"message": "Person not found"}, 404
+
+
+@app.get("/person/<string:name>")
+def get_quote(name):
+    for person in persons:
+        if person["name"] == name:
+            return person, 201
+    return {"message": "Person not found"}, 404
+
+
+@app.get("/person/<string:name>/quote")
+def get_quote_from_person(name):
+    for person in persons:
+        if person["name"] == name:
+            return {"quotes": person["quotes"]}
+    return {"message": "Person not found"}, 404
