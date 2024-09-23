@@ -3,9 +3,12 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired
 from flask import request
+import os
+#from dotenv import load_dotenv
+#load_dotenv()
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = ""
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 
 # Create a form class
 class PersonForm(FlaskForm):
@@ -30,10 +33,12 @@ def home():
     form = PersonForm()
     if form.validate_on_submit():
         name = form.name.data
+        new_person = {"name": form.name.data, "quotes": []}
+        persons.append(new_person)
         form.name.data = ""
     return render_template("index.html",
         name = name,
-        form = form
+        form = form,
     )
 
 @app.get("/person")
