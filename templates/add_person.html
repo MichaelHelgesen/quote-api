@@ -1,3 +1,6 @@
+{% for message in get_flashed_messages() %}
+    {{ message }}
+{% endfor %}
 <h1>Hello World!<h1>
     <form method="POST">
         {{form.hidden_tag()}}
