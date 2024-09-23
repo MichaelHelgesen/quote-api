@@ -1,5 +1,5 @@
-from flask import Flask, render_template, flash
-from flask import request
+from flask import Flask, render_template, flash, request
+from flask_smorest import abort
 
 from db import persons, quotes
 
@@ -22,7 +22,7 @@ class PersonForm(FlaskForm):
     submit = SubmitField("Submit")
 
 class QuoteForm(FlaskForm):
-    name = StringField("Name", validators=[DataRequired()])
+    person_id = StringField("Person ID", validators=[DataRequired()])
     quote = StringField("Quote", validators=[DataRequired()])
     source = StringField("Source")
     submit = SubmitField("Submit")
@@ -34,8 +34,9 @@ def home():
     form = PersonForm()
     if form.validate_on_submit():
         name = form.name.data
-        new_person = {"name": form.name.data, "quotes": []}
-        persons.append(new_person)
+        person_id = uuid.uuid4().hex
+        new_person = {"name": name, "id": person_id}
+        persons[person_id] = new_person
         form.name.data = ""
         flash("Person added")
     return render_template("add_person.html",
@@ -50,6 +51,11 @@ def get_persons():
 @app.post("/person")
 def create_person():
     person_data = request.get_json()
+    if "name" not in person_data or person_data["name"] == "":
+        abort(400, message="Bad request. Ensure 'name' is included in the JSON payload")
+    for person in persons.values():
+        if person_data["name"] == person["name"]:
+            abort(400, message="Person already exists.")
     person_id = uuid.uuid4().hex
     new_person = {**person_data, "id": person_id}
     persons[person_id] = new_person
@@ -58,32 +64,38 @@ def create_person():
 
 @app.route("/add_quote", methods=["GET", "POST"])
 def add_quote():
-    name = None
+    person_id = None
     quote = None
     source = None
     form = QuoteForm()
     if form.validate_on_submit():
-        name = form.name.data
+        person_id = form.person_id.data
         quote = form.quote.data
         source = form.source.data
-        for person in persons:
-            if person["name"] == name:
-                new_quote = {"quote": form.quote.data, "source": form.source.data}
-                person["quotes"].append(new_quote)
-                form.name.data = ""
-                form.quote.data = ""
-                form.source.data = ""
-                flash("Quote added")
-                return render_template("add_quote.html",
-                    name = name,
-                    quote = quote,
-                    source = source,
-                    form = form
-                )
-        flash("Name not found")
+        if person_id not in persons:
+            flash("Name not found")
+            return render_template("add_quote.html",
+                name = person_id,
+                quote = quote,
+                source = source,
+                form = form
+            )
 
+        quote_id = uuid.uuid4().hex
+        new_quote = {"quote": quote, "source": source, "id": quote_id, "person_id": person_id}
+        quotes[quote_id] = new_quote
+        form.person_id.data = ""
+        form.quote.data = ""
+        form.source.data = ""
+        flash("Quote added")
+        return render_template("add_quote.html",
+            person_id = person_id,
+            quote = quote,
+            source = source,
+            form = form
+        )
     return render_template("add_quote.html",
-        name = name,
+        person_id = person_id,
         quote = quote,
         source = source,
         form = form
@@ -92,14 +104,17 @@ def add_quote():
 @app.post("/quote")
 def create_quote():
     quote_data = request.get_json()
-    if item_data["person_id"] not in persons:
-        return {"message": "Person not found"}, 404
+    if ("quote" not in quote_data or "person_id" not in quote_data):
+        abort(400, message="Bad request. Ensure 'quote' and 'person_id' are included in the JSON payload")
+        
+    if quote_data["person_id"] not in persons:
+        abort(404, message = "Person not found")
 
     quote_id = uuid.uuid4().hex
     new_quote = {**quote_data, "id": quote_id}
     quotes[quote_id] = new_quote
     
-    return {"message": "Person not found"}, 404
+    return new_quote, 201
 
 @app.get("/quote")
 def get_all_quotes():
@@ -110,7 +125,7 @@ def get_person(person_id):
     try:
         return persons[person_id]
     except KeyError:
-        return {"message": "Person not found"}, 404
+        abort(404, message = "Person not found")
 
 
 @app.get("/quote/<string:quote_id>")
@@ -118,4 +133,4 @@ def get_quote(quote_id):
     try:
         return quotes[quote_id]
     except KeyError:
-        return {"message": "Quote not found"}, 404
+        abort(404, message = "Quote not found")
