@@ -1,9 +1,13 @@
 from flask import Flask, render_template, flash
 from flask import request
 
+from db import persons, quotes
+
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired
+
+import uuid
 
 import os
 #from dotenv import load_dotenv
@@ -23,17 +27,6 @@ class QuoteForm(FlaskForm):
     source = StringField("Source")
     submit = SubmitField("Submit")
 
-persons = [
-    {
-        "name": "aristoteles",
-        "quotes": [
-            {
-            "quote": "To be or not to be",
-            "source": "Book"
-            }
-        ]
-    }
-]
 
 @app.route("/add_person", methods=["GET", "POST"])
 def home():
@@ -52,13 +45,14 @@ def home():
 
 @app.get("/person")
 def get_persons():
-    return {"persons": persons}
+    return {"persons": list(persons.values())}
 
 @app.post("/person")
 def create_person():
-    request_data = request.get_json()
-    new_person = {"name": request_data["name"], "quotes": []}
-    persons.append(new_person)
+    person_data = request.get_json()
+    person_id = uuid.uuid4().hex
+    new_person = {**person_data, "id": person_id}
+    persons[person_id] = new_person
     return new_person, 201
 
 
@@ -95,28 +89,33 @@ def add_quote():
         form = form
     )
 
-@app.post("/person/<string:name>/quote")
-def create_quote(name):
-    request_data = request.get_json()
-    for person in persons:
-        if person["name"] == name:
-            new_quote = {"quote": request_data["quote"], "source": request_data["source"]}
-            person["quotes"].append(new_quote)
-            return new_quote, 201
+@app.post("/quote")
+def create_quote():
+    quote_data = request.get_json()
+    if item_data["person_id"] not in persons:
+        return {"message": "Person not found"}, 404
+
+    quote_id = uuid.uuid4().hex
+    new_quote = {**quote_data, "id": quote_id}
+    quotes[quote_id] = new_quote
+    
     return {"message": "Person not found"}, 404
 
+@app.get("/quote")
+def get_all_quotes():
+    return {"quotes": list(quotes.values())}
 
-@app.get("/person/<string:name>")
-def get_quote(name):
-    for person in persons:
-        if person["name"] == name:
-            return person, 201
-    return {"message": "Person not found"}, 404
+@app.get("/person/<string:person_id>")
+def get_person(person_id):
+    try:
+        return persons[person_id]
+    except KeyError:
+        return {"message": "Person not found"}, 404
 
 
-@app.get("/person/<string:name>/quote")
-def get_quote_from_person(name):
-    for person in persons:
-        if person["name"] == name:
-            return {"quotes": person["quotes"]}
-    return {"message": "Person not found"}, 404
+@app.get("/quote/<string:quote_id>")
+def get_quote(quote_id):
+    try:
+        return quotes[quote_id]
+    except KeyError:
+        return {"message": "Quote not found"}, 404
