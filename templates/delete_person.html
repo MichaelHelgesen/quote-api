@@ -1,0 +1,11 @@
+{% for message in get_flashed_messages() %}
+    {{ message }}
+{% endfor %}
+<h1>Delete person!<h1>
+    <form method="POST">
+        {{form.hidden_tag()}}
+        {{form.person_id.label}}
+        {{form.person_id()}}
+        {{form.submit()}}
+    </form>
+
