@@ -1,0 +1,15 @@
+{% for message in get_flashed_messages() %}
+    {{ message }}
+{% endfor %}
+<h1>Update quote!<h1>
+    <form method="POST">
+        {{form.hidden_tag()}}
+        {{form.quote_id.label}}
+        {{form.quote_id()}}
+        {{form.quote.label}}
+        {{form.quote()}}
+        {{form.source.label}}
+        {{form.source()}}
+        {{form.submit()}}
+    </form>
+
