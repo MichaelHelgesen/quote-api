@@ -3,11 +3,13 @@ from flask import request
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
 from db import quotes
+from schemas import QuoteSchema, QuoteUpdateSchema
 
 blp = Blueprint("Quotes", __name__, description="Operations on quotes")
 
 @blp.route("/quote/<string:quote_id>")
 class Quote(MethodView):
+    @blp.response(200, QuoteSchema)
     def get(self, quote_id):
         try:
             return quotes[quote_id]
@@ -20,11 +22,10 @@ class Quote(MethodView):
             return {"message": "Item deleted"}
         except KeyError:
             abort(404, message="Item not found")
-
-    def put(self, quote_id):
-        quote_data = request.get_json()
-        if "quote" not in quote_data or quote_data["quote"] == "":
-            abort(400, message="Bad request. Ensure quote is written")
+    
+    @blp.arguments(QuoteUpdateSchema)
+    @blp.response(200, QuoteSchema)
+    def put(self, quote_data, quote_id):
 
         try:
             quote = quotes[quote_id]
@@ -36,13 +37,13 @@ class Quote(MethodView):
 
 @blp.route("/quote")
 class QuoteList(MethodView):
+    @blp.response(200, QuoteSchema(many=True))
     def get(self):
-        return {"quotes": list(quotes.values())}
+        return quotes.values()
     
-    def post(self):
-        quote_data = request.get_json()
-        if ("quote" not in quote_data or "person_id" not in quote_data):
-            abort(400, message="Bad request. Ensure 'quote' and 'person_id' are included in the JSON payload")
+    @blp.arguments(QuoteSchema)
+    @blp.response(201, QuoteSchema)
+    def post(self, quote_data):
             
         if quote_data["person_id"] not in persons:
             abort(404, message = "Person not found")

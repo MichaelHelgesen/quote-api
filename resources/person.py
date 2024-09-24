@@ -3,11 +3,13 @@ from flask import request
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
 from db import persons
+from schemas import PersonSchema
 
 blp = Blueprint("Persons", __name__, description="Operations on persons")
 
 @blp.route("/person/<string:person_id>")
 class Person(MethodView):
+    @blp.response(200, PersonSchema)
     def get(self, person_id):
         try:
             return persons[person_id]
@@ -23,15 +25,13 @@ class Person(MethodView):
 
 @blp.route("/person")
 class PersonList(MethodView):
+    @blp.response(201, PersonSchema(many=True))
     def get(self):
-        return {"persons": list(persons.values())}
+        return persons.values()
     
-    def post(self):
-        person_data = request.get_json()
-
-        if "name" not in person_data or person_data["name"] == "":
-            abort(400, message="Bad request. Ensure 'name' is included in the JSON payload")
-
+    @blp.arguments(PersonSchema)
+    @blp.response(200, PersonSchema)
+    def post(self, person_data):
         for person in persons.values():
             if person_data["name"] == person["name"]:
                 abort(400, message="Person already exists.")
