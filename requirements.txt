@@ -2,3 +2,5 @@ flask
 flask-smorest
 flask-wtf
 python-dotenv
+sqlalchemy
+flask-sqlalchemy
