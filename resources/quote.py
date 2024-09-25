@@ -2,7 +2,7 @@ import uuid
 from flask import request, render_template, flash
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
-from models import QuoteModel
+from models import QuoteModel, TagModel
 from sqlalchemy.exc import SQLAlchemyError
 from db import db
 from schemas import QuoteSchema, QuoteUpdateSchema
@@ -15,6 +15,7 @@ class QuoteForm(FlaskForm):
     person_id = StringField("Person ID", validators=[DataRequired()])
     quote = StringField("Quote", validators=[DataRequired()])
     source = StringField("Source")
+    tag = StringField("Tag")
     submit = SubmitField("Submit")
 
 class UpdateQuoteForm(FlaskForm):
@@ -82,32 +83,52 @@ def add_quote():
     person_id = None
     quote = None
     source = None
+    tag = None
     form = QuoteForm()
     if form.validate_on_submit():
         quote = QuoteModel(**{"person_id":form.data["person_id"], "quote":form.data["quote"], "source":form.data["source"]})
-        try:
-            db.session.add(quote)
-            db.session.commit()
-            form.person_id.data = ""
-            form.quote.data = ""
-            form.source.data = ""
-            flash("Quote added")
+        if TagModel.query.filter(TagModel.name == form.data["tag"]).first():
+            flash("Tag exists")
             return render_template("add_quote.html",
                 person_id = person_id,
                 quote = quote,
                 source = source,
+                tag = tag,
                 form = form
+
             )
-        except SQLAlchemyError:
+        elif QuoteModel.query.filter(QuoteModel.quote == form.data["quote"]).first():
             flash("Quote exists")
             return render_template("add_quote.html",
                 person_id = person_id,
                 quote = quote,
                 source = source,
+                tag = tag,
                 form = form
             )
+        else:
+            tag = TagModel(**{"name":form.data["tag"]})
+            try:
+                db.session.add(quote)
+                db.session.add(tag)
+                db.session.commit()
+                flash("Quote added")
+                form.person_id.data = ""
+                form.quote.data = ""
+                form.tag.data = ""
+                form.source.data = ""
+            except SQLAlchemyError:
+                flash("Something went wrong")
+                return render_template("add_quote.html",
+                    person_id = person_id,
+                    quote = quote,
+                    source = source,
+                    tag = tag,
+                    form = form
+                )
     return render_template("add_quote.html",
         person_id = person_id,
+        tag = tag,
         quote = quote,
         source = source,
         form = form

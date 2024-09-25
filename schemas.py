@@ -21,11 +21,20 @@ class QuoteUpdateSchema(Schema):
 class QuoteSchema(PlainQuoteSchema):
     person_id = fields.Int(required=True, load_only=True)
     person = fields.Nested(PlainPersonSchema(), dump_only=True)
+    #tags = fields.List(fields.Nested(PlainTagSchema()), dump_only=True)
     tags = fields.List(fields.Nested(PlainTagSchema()), dump_only=True)
-
+    
 class PersonSchema(PlainPersonSchema):
     quotes = fields.List(fields.Nested(PlainQuoteSchema()), dump_only=True)
 
 class TagSchema(PlainTagSchema):
-    quote_id = fields.Int(load_only=True)
-    quote = fields.Nested(PlainQuoteSchema(), dump_only=True)
+    #quote_id = fields.Int(load_only=True)
+    #quote = fields.Nested(PlainQuoteSchema(), dump_only=True)
+    quote = fields.List(fields.Nested(PlainQuoteSchema()), dump_only=True)
+
+
+class TagAndQuoteSchema(Schema):
+    message = fields.Str()
+    quote = fields.Nested(QuoteSchema)
+    tags = fields.Nested(TagSchema)
+
