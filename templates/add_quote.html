@@ -4,14 +4,14 @@
 <h1>Add quote!<h1>
     <form method="POST">
         {{form.hidden_tag()}}
-        {{form.person_id.label}}
-        {{form.person_id()}}
-        {{form.quote.label}}
-        {{form.quote()}}
-        {{form.source.label}}
-        {{form.source()}}
-        {{form.tag.label}}
-        {{form.tag()}}
+        {{form.quote.label}}<br />
+        {{form.quote()}}<br />
+        {{form.person_id.label}}<br />
+        {{form.person_id()}}<br />
+        {{form.source.label}}<br />
+        {{form.source()}}<br />
+        {{form.tag.label}}<br />
+        {{form.tag()}}<br />
         {{form.submit()}}
     </form>
     <p>{{tagtest}}</p>
