@@ -7,4 +7,4 @@ class QuoteModel(db.Model):
     quote = db.Column(db.String(256), unique=True, nullable=False)
     source = db.Column(db.String(80), unique=False, nullable=True)
     person_id = db.Column(db.Integer, db.ForeignKey("persons.id"), unique=False, nullable=False)
-    person = db.relationship("PersonModel", back_populates="quotes")
+    person = db.relationship("PersonModel", back_populates="quote")

@@ -12,6 +12,7 @@ class PlainPersonSchema(Schema):
 class QuoteUpdateSchema(Schema):
     quote = fields.Str()
     source = fields.Str()
+    person_id = fields.Int()
 
 class QuoteSchema(PlainQuoteSchema):
     person_id = fields.Int(required=True, load_only=True)
