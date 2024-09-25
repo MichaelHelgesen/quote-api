@@ -8,3 +8,4 @@ class QuoteModel(db.Model):
     source = db.Column(db.String(80), unique=False, nullable=True)
     person_id = db.Column(db.Integer, db.ForeignKey("persons.id"), unique=False, nullable=False)
     person = db.relationship("PersonModel", back_populates="quote")
+    tags = db.relationship("TagModel", back_populates="quote", lazy="dynamic")

@@ -6,6 +6,7 @@ import models
 
 from resources.quote import blp as QuoteBlueprint
 from resources.person import blp as PersonBlueprint
+from resources.tag import blp as TagBlueprint
 
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
@@ -39,6 +40,7 @@ def create_app(db_url=None):
 
     api.register_blueprint(QuoteBlueprint)
     api.register_blueprint(PersonBlueprint)
+    api.register_blueprint(TagBlueprint)
 
     return app
 
