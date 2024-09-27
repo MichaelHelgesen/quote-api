@@ -4,3 +4,5 @@ flask-wtf
 python-dotenv
 sqlalchemy
 flask-sqlalchemy
+WTForms-SQLAlchemy
+bootstrap-flask

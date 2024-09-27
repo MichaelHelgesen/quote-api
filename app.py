@@ -1,6 +1,6 @@
 from flask import Flask, render_template, flash
 from flask_smorest import Api
-
+from flask_bootstrap import Bootstrap4
 from db import db
 import models
 
@@ -43,6 +43,6 @@ def create_app(db_url=None):
     api.register_blueprint(PersonBlueprint)
     api.register_blueprint(TagBlueprint)
     api.register_blueprint(HomeBlueprint)
-
+    bootstrap = Bootstrap4(app)
     return app
 
