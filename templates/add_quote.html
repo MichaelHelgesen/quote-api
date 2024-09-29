@@ -29,6 +29,18 @@
         {{form.tag(class_="js-example-basic-multiple")}}
         {{form.submit()}}
     </form>
+    <ul>
+        {% for tag in tags %}
+            <li>
+                {{ tag.name }}
+                {% if not tag.quote %}
+                    <form method="POST" action="{{ url_for('Homepage.RemoveTag', id=tag.id) }}"> 
+                        <button type="submit">Delete</button>
+                    </form>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
 <script>
 $(document).ready(function() {
     $('.js-example-basic-multiple').select2({

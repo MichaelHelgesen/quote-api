@@ -10,6 +10,20 @@ from forms import QuoteForm
 
 blp = Blueprint("Homepage", __name__, description="Adding quotes")
 
+@blp.route("/del_tag/<int:id>")
+class RemoveTag(MethodView):
+    def post(self, id):
+        try:
+            tag = TagModel.query.get_or_404(id)
+            if not tag.quote:
+                db.session.delete(tag)
+                db.session.commit()
+                flash("message: Tag deleted")
+                return redirect(url_for('Homepage.AddQuote'))
+        except:
+            flash("ikke tag")
+            return redirect(url_for('Homepage.AddQuote'))
+
 @blp.route("/")
 class AddQuote(MethodView):
     def get(self):
@@ -25,7 +39,7 @@ class AddQuote(MethodView):
         form.person_id.choices.insert(0,("", "Velg person"))
         #form.tag.choices = [(t.id, t.name.title()) for t in tags]
         form.tag.query = db.session.query(TagModel).order_by(TagModel.name)
-        flash(form.tag.data)
+        #flash(form.tag.data)
         return render_template("add_quote.html",
             person_id = person_id,
             tag = tag,
@@ -65,9 +79,10 @@ class AddQuote(MethodView):
                 
             quote = QuoteModel(**{"person_id":form.data["person_id"], "quote":form.data["quote"], "source":form.data["source"]})
             flash("validate")
-            flash(form.tag.data)
+            #flash(form.tag.data)
             selected_tags = request.form.getlist("tag")
             for tag in selected_tags:
+                flash(tag)
                 try: 
                     quote.tags.append(TagModel.query.get_or_404(tag))
                     flash("yes")
@@ -76,7 +91,7 @@ class AddQuote(MethodView):
                     tag = TagModel(**{"name":tag})
                     db.session.add(tag)
                     db.session.commit()
-                    #quote.tags.append(tag)
+                    quote.tags.append(tag)
 
             try:
                 #db.session.add(quote)
