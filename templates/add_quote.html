@@ -22,13 +22,24 @@
         {{form.quote.label}}<br />
         {{form.quote()}}<br />
         {{form.person_id.label}}<br />
-        {{form.person_id()}}<br />
+        {{form.person_id(class_="js-person-multiple")}}<br />
         {{form.source.label}}<br />
         {{form.source()}}<br />
         {{form.tag.label}}<br />
         {{form.tag(class_="js-example-basic-multiple")}}
         {{form.submit()}}
     </form>
+    <ul>
+        {% for quote in quotes %}
+            <li>
+                {{ quote.quote }}<br />
+                {{ quote.person.name }}<br />
+                {% for tag in quote.tags %}
+                    <span>{{ tag.name }}</span>
+                {% endfor %}
+            </li>
+        {% endfor %}
+    </ul>
     <ul>
         {% for tag in tags %}
             <li>
@@ -44,8 +55,14 @@
 <script>
 $(document).ready(function() {
     $('.js-example-basic-multiple').select2({
+        placeholder: "Velg en kategori",
         tags: true,
         tokenSeparators: [',', ' ']
+    });
+    $('.js-person-multiple').select2({
+        placeholder: "Velg sitatgiver",
+        tags: true,
+        maximumSelectionLength: 1
     });
 });
                 </script>

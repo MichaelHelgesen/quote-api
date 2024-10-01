@@ -32,13 +32,15 @@ class AddQuote(MethodView):
         source = None
         tag = None
         form = QuoteForm()
+        quotes = QuoteModel.query.all()
         persons = PersonModel.query.all()
         tags = TagModel.query.all()
-        form.person_id.choices = [(persons.id, persons.name.title()) for persons in persons]
+        #form.person_id.choices = [(persons.id, persons.name.title()) for persons in persons]
         #form.person_id.process([])
-        form.person_id.choices.insert(0,("", "Velg person"))
+        #form.person_id.choices.insert(0,("", "Velg person"))
         #form.tag.choices = [(t.id, t.name.title()) for t in tags]
         form.tag.query = db.session.query(TagModel).order_by(TagModel.name)
+        form.person_id.query = db.session.query(PersonModel).order_by(PersonModel.name)
         #flash(form.tag.data)
         return render_template("add_quote.html",
             person_id = person_id,
@@ -47,7 +49,8 @@ class AddQuote(MethodView):
             source = source,
             form = form,
             persons = persons,
-            tags = tags
+            tags = tags,
+            quotes = quotes
         )
 
     def post(self):
@@ -57,13 +60,16 @@ class AddQuote(MethodView):
         tag = None
         form = QuoteForm()
         persons = PersonModel.query.all()
+        quotes = QuoteModel.query.all()
         tags = TagModel.query.all()
-        form.person_id.choices = [(persons.id, persons.name.title()) for persons in persons]
+        #form.person_id.choices = [(persons.id, persons.name.title()) for persons in persons]
         #form.person_id.process([])
-        form.person_id.choices.insert(0,("", "Velg person"))
+        #form.person_id.choices.insert(0,("", "Velg person"))
         #form.tag.query = TagModel.query.all()
         #form.tag.choices = [(t.id, t.name.title()) for t in tags]
         form.tag.query = db.session.query(TagModel).order_by(TagModel.name)
+        form.person_id.query = db.session.query(PersonModel).order_by(PersonModel.name)
+
         if form.validate_on_submit():
             if QuoteModel.query.filter(QuoteModel.quote == form.data["quote"]).first():
                 flash("Quote already exist")
@@ -74,13 +80,28 @@ class AddQuote(MethodView):
                     source = source,
                     form = form,
                     persons = persons,
-                    tags = tags
+                    tags = tags,
+                    quotes = quotes
                 )
                 
             quote = QuoteModel(**{"person_id":form.data["person_id"], "quote":form.data["quote"], "source":form.data["source"]})
             flash("validate")
             #flash(form.tag.data)
             selected_tags = request.form.getlist("tag")
+            selected_persons = request.form.getlist("person_id")
+            for person in selected_persons:
+                try: 
+                    PersonModel.query.get_or_404(person)
+                    flash("Person is")
+                    flash(request.form["person_id"])
+                except:
+                    person = PersonModel(**{"name":person})
+                    #form.person_id = person
+                    #form.person_id.process()
+                    flash("testing")
+                    db.session.add(person)
+                    db.session.commit()
+
             for tag in selected_tags:
                 flash(tag)
                 try: 
@@ -110,7 +131,8 @@ class AddQuote(MethodView):
                     source = source,
                     form = form,
                     persons = persons,
-                    tags = tags
+                    tags = tags,
+                    quotes = quotes
                 )
             
             '''
@@ -161,6 +183,7 @@ class AddQuote(MethodView):
         #flash(form.tag.data)
         #flash(form.tag.choices)
         #flash(form.source.data)
+        flash("oops")
         return render_template("add_quote.html",
             person_id = person_id,
             tag = tag,
@@ -168,5 +191,6 @@ class AddQuote(MethodView):
             source = source,
             form = form,
             persons = persons,
-            tags = tags
+            tags = tags,
+            quotes = quotes
         )
