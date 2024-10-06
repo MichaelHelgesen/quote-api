@@ -33,10 +33,13 @@
         {% for quote in quotes %}
             <li>
                 {{ quote.quote }}<br />
-                {{ quote.person.name }}<br />
+                <span style="color: red;">{{ quote.person.name }}</span><br />
                 {% for tag in quote.tags %}
                     <span>{{ tag.name }}</span>
                 {% endfor %}
+                <form method="GET" action="{{ url_for('Edit.EditQuote', id = quote.id)}}">
+                    <button>Rediger</button>
+                </form>
             </li>
         {% endfor %}
     </ul>

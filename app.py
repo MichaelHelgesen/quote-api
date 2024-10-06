@@ -8,6 +8,7 @@ from resources.quote import blp as QuoteBlueprint
 from resources.person import blp as PersonBlueprint
 from resources.tag import blp as TagBlueprint
 from pages.home import blp as HomeBlueprint
+from pages.edit import blp as EditBlueprint
 
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
@@ -43,6 +44,7 @@ def create_app(db_url=None):
     api.register_blueprint(PersonBlueprint)
     api.register_blueprint(TagBlueprint)
     api.register_blueprint(HomeBlueprint)
+    api.register_blueprint(EditBlueprint)
     bootstrap = Bootstrap4(app)
     return app
 

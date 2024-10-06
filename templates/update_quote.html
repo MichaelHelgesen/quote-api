@@ -1,15 +1,50 @@
+<html lang="en">
+  <head>
+<script
+  src="https://code.jquery.com/jquery-3.4.1.min.js"
+  integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+  crossorigin="anonymous"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.10/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.10/js/select2.min.js"></script>
+</head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>HTML 5 Boilerplate</title>
+  </head>
+  <body>
 {% for message in get_flashed_messages() %}
     {{ message }}
 {% endfor %}
-<h1>Update quote!<h1>
+<h1>Edit quote!<h1>
+        {{ quote.person.id }}
     <form method="POST">
         {{form.hidden_tag()}}
-        {{form.quote_id.label}}
-        {{form.quote_id()}}
-        {{form.quote.label}}
-        {{form.quote()}}
-        {{form.source.label}}
-        {{form.source()}}
+        <label for="quote">Enter response here:</label><br>
+        <textarea 
+            class="form-control mx-auto w-auto" 
+            autocomplete="off" 
+            id="quote" 
+            name="quote" placeholder="Update Quote"
+            >{{quote.quote}}</textarea><br />
+        {{form.person_id.label}}<br />
+        {{form.person_id(class_="js-person-multiple")}}<br />
         {{form.submit()}}
     </form>
+<script>
+$(document).ready(function() {
+    $('.js-example-basic-multiple').select2({
+        placeholder: "Velg en kategori",
+        tags: true,
+        tokenSeparators: [',', ' ']
+    });
+    $('.js-person-multiple').select2({
+        placeholder: "Velg sitatgiver",
+        tags: true,
+        maximumSelectionLength: 1
+    });
+});
+                </script>
+  </body>
+</html>
 
