@@ -83,40 +83,49 @@ class AddQuote(MethodView):
                     tags = tags,
                     quotes = quotes
                 )
-                
-            quote = QuoteModel(**{"person_id":form.data["person_id"], "quote":form.data["quote"], "source":form.data["source"]})
             flash("validate")
             #flash(form.tag.data)
             selected_tags = request.form.getlist("tag")
             selected_persons = request.form.getlist("person_id")
             for person in selected_persons:
-                try: 
-                    PersonModel.query.get_or_404(person)
+                if PersonModel.query.get(person):
+                    person_id = PersonModel.query.get(person).id
                     flash("Person is")
                     flash(request.form["person_id"])
-                except:
-                    person = PersonModel(**{"name":person})
-                    #form.person_id = person
-                    #form.person_id.process()
-                    flash("testing")
-                    db.session.add(person)
-                    db.session.commit()
+                else:
+                    try: 
+                        newPerson = PersonModel(**{"name":person})
+                        flash("testing")
+                        db.session.add(newPerson)
+                        db.session.commit()
+                        person_id = PersonModel.query.get(person).id
+                    except:
+                        db.session.rollback()
+                    finally:
+                        db.session.close()
+                        #form.person_id = person
+                        #form.person_id.process()
 
+            quote = QuoteModel(**{"person_id":person_id, "quote":form.data["quote"], "source":form.data["source"]})
             for tag in selected_tags:
-                flash(tag)
-                try: 
-                    quote.tags.append(TagModel.query.get_or_404(tag))
-                    flash("yes")
-                except:
+                if quote.tags.append(TagModel.query.get_or_404(tag)):
                     flash(tag)
-                    tag = TagModel(**{"name":tag})
-                    db.session.add(tag)
-                    db.session.commit()
-                    quote.tags.append(tag)
+                    try: 
+                        flash(tag)
+                        tag = TagModel(**{"name":tag})
+                        db.session.add(tag)
+                        #db.session.commit()
+                        quote.tags.append(tag)
+                        flash("yes")
+                    except:
+                        db.session.rollback()
+                    finally:
+                        db.session.close()
 
+            #flash(form.person_id.data) 
             try:
-                #db.session.add(quote)
-                #db.session.commit()
+                db.session.add(quote)
+                db.session.commit()
                 flash("Quote added")
                 form.person_id.data = ""
                 form.quote.data = []
