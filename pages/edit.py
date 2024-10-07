@@ -20,10 +20,14 @@ class EditQuote(MethodView):
         #tag = None
         form = QuoteForm()
         form.person_id.data = {person}
+        test = TagModel.query.first()
+        flash(test)
+        form.tag.data = {test}
         flash(form.person_id.data) 
         #quotes = QuoteModel.query.all()
         persons = PersonModel.query.all()
         #tags = TagModel.query.all()
+        form.tag.query = db.session.query(TagModel).order_by(TagModel.name)
         form.person_id.query = db.session.query(PersonModel).order_by(PersonModel.name)
         return render_template("update_quote.html",
             person_id = person.id,
@@ -39,7 +43,7 @@ class EditQuote(MethodView):
     def post(self, id):
         #person_id = None
         quote = QuoteModel.query.get_or_404(id);
-        #source = None
+        #source = quote
         #tag = None
         form = QuoteForm()
         
@@ -53,7 +57,7 @@ class EditQuote(MethodView):
             #person_id = person_id,
             #tag = tag,
             quote = quote,
-            #source = source,
+            source = source,
             form = form,
             #persons = persons,
             #tags = tags,
