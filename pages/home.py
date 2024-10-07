@@ -91,14 +91,14 @@ class AddQuote(MethodView):
                 if PersonModel.query.get(person):
                     person_id = PersonModel.query.get(person).id
                     flash("Person is")
-                    flash(request.form["person_id"])
                 else:
                     try: 
                         newPerson = PersonModel(**{"name":person})
                         flash("testing")
                         db.session.add(newPerson)
                         db.session.commit()
-                        person_id = PersonModel.query.get(person).id
+                        person_id = PersonModel.query.filter(PersonModel.name == person).first().id
+                        flash(person_id)
                     except:
                         db.session.rollback()
                     finally:
@@ -108,21 +108,23 @@ class AddQuote(MethodView):
 
             quote = QuoteModel(**{"person_id":person_id, "quote":form.data["quote"], "source":form.data["source"]})
             for tag in selected_tags:
-                if quote.tags.append(TagModel.query.get_or_404(tag)):
+                if TagModel.query.get(tag):
+                    quote.tags.append(TagModel.query.get(tag))
                     flash(tag)
+                else:
                     try: 
                         flash(tag)
-                        tag = TagModel(**{"name":tag})
-                        db.session.add(tag)
-                        #db.session.commit()
-                        quote.tags.append(tag)
+                        newTag = TagModel(**{"name":tag})
+                        db.session.add(newTag)
+                        db.session.commit()
+                        quote.tags.append(newTag)
                         flash("yes")
                     except:
                         db.session.rollback()
                     finally:
                         db.session.close()
 
-            #flash(form.person_id.data) 
+            #flash() 
             try:
                 db.session.add(quote)
                 db.session.commit()
