@@ -74,7 +74,7 @@ class AddQuote(MethodView):
             if QuoteModel.query.filter(QuoteModel.quote == form.data["quote"]).first():
                 flash("Quote already exist")
                 return render_template("add_quote.html",
-                    person_id = person_id,
+                    #person_id = person_id,
                     tag = tag,
                     quote = quote,
                     source = source,

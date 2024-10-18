@@ -9,9 +9,9 @@ def get_tags_name():
 
 class QuoteForm(FlaskForm):
     person_id = QuerySelectMultipleField("PERSON", get_label="name", allow_blank=False, blank_text="Select person", render_kw={"size": 30}, validators=[InputRequired()])
-    quote = TextAreaField("Quote", validators=[DataRequired()] )
+    quote = TextAreaField("Quote", validators=[InputRequired()] )
     source = StringField("Source")
-    tag = QuerySelectMultipleField("TAGS", get_label="name", allow_blank=False, blank_text="Select", render_kw={"size": 30})
+    tag = QuerySelectMultipleField("TAGS", get_label="name", allow_blank=False, blank_text="Select", render_kw={"size": 10})
     submit = SubmitField("Submit")
 
 class PersonForm(FlaskForm):

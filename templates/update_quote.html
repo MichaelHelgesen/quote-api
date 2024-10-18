@@ -20,17 +20,14 @@
         {{ quote.person.id }}
     <form method="POST">
         {{form.hidden_tag()}}
-        <label for="quote">Enter response here:</label><br>
-        <textarea 
-            class="form-control mx-auto w-auto" 
-            autocomplete="off" 
-            id="quote" 
-            name="quote" placeholder="Update Quote"
-            >{{quote.quote}}</textarea><br />
+        {{form.quote.label}}
+        {{form.quote}}<br />
         {{form.person_id.label}}<br />
         {{form.person_id(class_="js-person-multiple")}}<br />
+        {{form.source.label}}<br>
+        {{form.source}}<br />
         {{form.tag.label}}<br />
-        {{form.tag}}
+        {{form.tag(class="js-example-basic-multiple")}}
         {{form.submit()}}
     </form>
 <script>

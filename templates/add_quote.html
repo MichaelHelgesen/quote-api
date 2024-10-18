@@ -37,7 +37,7 @@
                 {% for tag in quote.tags %}
                     <span>{{ tag.name }}</span>
                 {% endfor %}
-                <form method="GET" action="{{ url_for('Edit.EditQuote', id = quote.id)}}">
+                <form method="GET" action="{{ url_for('Edit.EditQuote', id=quote.id)}}">
                     <button>Rediger</button>
                 </form>
             </li>
