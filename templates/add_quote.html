@@ -33,9 +33,9 @@
         {% for quote in quotes %}
             <li>
                 {{ quote.quote }}<br />
-                <span style="color: red;">{{ quote.person.name }}</span><br />
+                <a href="{{ url_for('Author.QuoteByAuthor', id=quote.person.id)}}">{{ quote.person.name }}</a><br />
                 {% for tag in quote.tags %}
-                    <span>{{ tag.name }}</span>
+                    <a href="{{ url_for('Tag.QuoteByTag', id=tag.id)}}">{{ tag.name }}</a>
                 {% endfor %}
                 <form method="GET" action="{{ url_for('Edit.EditQuote', id=quote.id)}}">
                     <button>Rediger</button>

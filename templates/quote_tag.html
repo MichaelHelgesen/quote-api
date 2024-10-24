@@ -1,0 +1,9 @@
+<h1>Quotes by {{tag.name}}</h1>
+
+{% for quote in quotes %}
+<h2>{{quote.quote}}</h2>
+<a href="{{ url_for('Author.QuoteByAuthor', id=quote.person.id)}}">{{quote.person.name}}</a></br>
+{% for tag in quote.tags %}
+    <a href="{{ url_for('Tag.QuoteByTag', id=tag.id)}}">{{ tag.name }}</a>
+{% endfor %}
+{% endfor %}
